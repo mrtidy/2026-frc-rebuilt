@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.config.DriveBaseSubsystemConfig;
 import frc.robot.subsystems.AbstractSubsystem;
 import swervelib.SwerveController;
@@ -334,11 +335,19 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
     private void configureSwerveDrive() {
         try {
             File configDirectory = new File(Filesystem.getDeployDirectory(), config.getSwerveDirectory());
-            swerveDrive      = new SwerveParser(configDirectory).createSwerveDrive(config.getMaximumLinearSpeedMetersPerSecond());
+            SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
+
+            swerveDrive                    = new SwerveParser(configDirectory).createSwerveDrive(config.getMaximumLinearSpeedMetersPerSecond());
+
+            if (RobotBase.isSimulation()) {
+                SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+                swerveDrive.setHeadingCorrection(false);
+                swerveDrive.setCosineCompensator(false);
+            }
+
             swerveController = swerveDrive.swerveController;
             swerveController.thetaController.setTolerance(config.getRotationToleranceRadians(), 0.1);
             swerveController.thetaController.setPID(config.getHeadingKp(), config.getHeadingKi(), config.getHeadingKd());
-            SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
 
             log.info("Drive base configured from " + configDirectory.getAbsolutePath());
         } catch (Throwable e) {
