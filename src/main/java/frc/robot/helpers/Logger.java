@@ -1,12 +1,13 @@
 package frc.robot.helpers;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Logger is a utility class for logging messages with different levels of severity. It supports verbose, debug, info, warning, and error messages.
  * The output is color-coded for better readability in the console and automatically includes the class name to help diagnose where the log
- * originated.
+ * originated. AdvantageKit is the preferred telemetry path; SmartDashboard helpers remain for operator-critical values only.
  */
 public class Logger {
 
@@ -114,6 +115,40 @@ public class Logger {
      */
     public void error(String message) {
         System.err.println("\u001B[31mERROR: " + className + ": " + message + "\u001B[0m");
+    }
+
+    /**
+     * Records a boolean to AdvantageKit using the class name as a prefix.
+     * Prefer this for telemetry instead of SmartDashboard to reduce NetworkTables noise.
+     */
+    public void recordOutput(String key, boolean value) {
+        org.littletonrobotics.junction.Logger.recordOutput(className + '/' + key, value);
+        debug("ak/" + key + ": " + value);
+    }
+
+    /**
+     * Records a numeric value to AdvantageKit using the class name as a prefix.
+     * Prefer this for telemetry instead of SmartDashboard to reduce NetworkTables noise.
+     */
+    public void recordOutput(String key, double value) {
+        org.littletonrobotics.junction.Logger.recordOutput(className + '/' + key, value);
+        debug("ak/" + key + ": " + value);
+    }
+
+    /**
+     * Records an array of numeric values to AdvantageKit using the class name as a prefix.
+     */
+    public void recordOutput(String key, double[] values) {
+        org.littletonrobotics.junction.Logger.recordOutput(className + '/' + key, values);
+        debug("ak/" + key + "[length=" + values.length + "]");
+    }
+
+    /**
+     * Records a pose to AdvantageKit using the class name as a prefix.
+     */
+    public void recordOutput(String key, Pose2d pose) {
+        org.littletonrobotics.junction.Logger.recordOutput(className + '/' + key, pose);
+        debug("ak/" + key + ": pose logged");
     }
 
     /**

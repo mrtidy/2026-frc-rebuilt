@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -11,6 +15,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -38,9 +43,27 @@ public class Robot extends LoggedRobot {
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         } else {
             setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-            Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+            String replayPath = System.getenv("REPLAY_LOG");
+
+            if (replayPath != null && !replayPath.isBlank()) {
+                // Use a supplied replay log (set REPLAY_LOG env var) and save a suffixed copy.
+                Logger.setReplaySource(new WPILOGReader(replayPath));
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(replayPath, "_sim")));
+            } else {
+                // No replay provided; publish live telemetry and log to a default sim file.
+                Logger.addDataReceiver(new NT4Publisher());
+                String basePath = Filesystem.getOperatingDirectory() != null
+                        ? Filesystem.getOperatingDirectory().getPath()
+                        : System.getProperty("user.dir", ".");
+                Path logDir   = Paths.get(basePath, "logs");
+                Path logFile  = logDir.resolve("sim.wpilog");
+                try {
+                    Files.createDirectories(logDir);
+                } catch (Exception ignored) {
+                    // If we cannot create the directory, WPILOGWriter will throw; better to fail later with context.
+                }
+                Logger.addDataReceiver(new WPILOGWriter(logFile.toString()));
+            }
         }
 
         Logger.start();

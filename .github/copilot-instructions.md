@@ -22,6 +22,10 @@ Follow them whenever you add code, documentation, or tests.
 
 - Follow standard Java conventions: `UpperCamelCase` classes, `lowerCamelCase`
   methods/fields, constants in `UPPER_SNAKE_CASE`.
+- Naming standards:
+  - Commands must end with `Command` (e.g., `MoveFieldManualCommand`).
+  - Subsystems must end with `Subsystem` (e.g., `DriveBaseSubsystem`).
+  - Factories/helpers should use descriptive nouns that reveal purpose.
 - Organize class members by visibility and role: public API at the top, followed
   by protected, package-private, and private helpers. Group overloads together.
 - Keep methods cohesive and self-descriptive. If logic is hard to infer from
@@ -81,16 +85,20 @@ Follow them whenever you add code, documentation, or tests.
 - When logic changes could affect runtime behavior, add or update
   tests/simulations where possible and run `./gradlew build` locally before
   committing.
+- After editing runnable code, prefer running `./gradlew build` to catch
+  regressions; keep builds frequent as we add more generated subsystems.
 - Mention any manual driver-station checks or hardware requirements in PR
   descriptions so reviewers know how to verify changes.
 
 ## Logging and telemetry
 
-- Use AdvantageKit as the primary logging pipeline; prefer
-  `LoggedDashboardValue` and structured log entries over ad-hoc
-  `SmartDashboard.putNumber` calls.
-- Reserve NetworkTables traffic for operator-critical values and bundle less
-  important data behind AdvantageKit-only logs to limit bandwidth noise.
+- Default to AdvantageKit (`org.littletonrobotics.junction.Logger`,
+  `LoggedDashboardValue`) for telemetry; record structured values with
+  `Logger.recordOutput` instead of SmartDashboard calls.
+- Use SmartDashboard/Shuffleboard only for operator-critical values that
+  drivers need live; keep everything else AdvantageKit-only to reduce
+  NetworkTables noise, especially as we add more subsystems and generated
+  components.
 - When adding detailed telemetry, wrap it in a verbose or debug flag so it can
   be disabled quickly for events; document how to toggle the flag in code or
   config.

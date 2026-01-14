@@ -4,18 +4,43 @@
 
 package frc.robot;
 
+import javax.naming.ConfigurationException;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.factories.DriveBaseSubsystemCommandFactory;
+import frc.robot.config.ConfigurationLoader;
+import frc.robot.config.SubsystemsConfig;
+import frc.robot.helpers.TriggerBindings;
+import frc.robot.subsystems.DriveBaseSubsystem;
 
 public class RobotContainer {
+
+    private final SubsystemsConfig                 subsystemsConfig;
+
+    private final DriveBaseSubsystem               driveBaseSubsystem;
+
+    private final DriveBaseSubsystemCommandFactory driveBaseCommandFactory;
+
+    private final TriggerBindings                  triggerBindings;
+
     public RobotContainer() {
-        configureBindings();
+        subsystemsConfig        = loadSubsystemConfig();
+        driveBaseSubsystem      = new DriveBaseSubsystem(subsystemsConfig.driveBaseSubsystem);
+        driveBaseCommandFactory = new DriveBaseSubsystemCommandFactory(driveBaseSubsystem);
+        triggerBindings         = new TriggerBindings(driveBaseCommandFactory, subsystemsConfig.driveBaseSubsystem);
     }
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
 
-    private void configureBindings() {
+    private SubsystemsConfig loadSubsystemConfig() {
+        try {
+            return ConfigurationLoader.load("subsystems.json", SubsystemsConfig.class);
+        } catch (ConfigurationException e) {
+            e.printStackTrace();
+            return new SubsystemsConfig();
+        }
     }
 }
