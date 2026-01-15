@@ -1,30 +1,50 @@
 package frc.robot.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import org.littletonrobotics.junction.networktables.LoggedNetworkString;
+
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class AbstractSubsystemConfig {
-    public boolean enabled = true;
+    private static final String                    SMART_DASHBOARD_PREFIX = "SmartDashboard/";
 
-    public boolean verbose = true;
+    public boolean                                 enabled                = true;
+
+    public boolean                                 verbose                = true;
+
+    private final Map<String, LoggedNetworkNumber> tunableNumbers         = new HashMap<>();
+
+    private final Map<String, LoggedNetworkString> tunableStrings         = new HashMap<>();
 
     /**
-     * Reads a tunable number from SmartDashboard, but returns the default when attached to FMS to avoid match-time latency.
+     * Reads a tunable number backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
+     * falls back to the default when attached to FMS to avoid match-time latency.
      */
     protected double readTunableNumber(String key, double defaultValue) {
-        if (DriverStation.isFMSAttached()) {
-            return defaultValue;
-        }
-        return SmartDashboard.getNumber(key, defaultValue);
+        String              dashboardKey    = dashboardKey(key);
+        LoggedNetworkNumber dashboardNumber = tunableNumbers.computeIfAbsent(dashboardKey,
+                k -> new LoggedNetworkNumber(k, defaultValue));
+        return DriverStation.isFMSAttached() ? defaultValue : dashboardNumber.get();
     }
 
     /**
-     * Reads a tunable string from SmartDashboard, but returns the default when attached to FMS to avoid match-time latency.
+     * Reads a tunable string backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
+     * falls back to the default when attached to FMS to avoid match-time latency.
      */
     protected String readTunableString(String key, String defaultValue) {
-        if (DriverStation.isFMSAttached()) {
-            return defaultValue;
+        String              dashboardKey    = dashboardKey(key);
+        LoggedNetworkString dashboardString = tunableStrings.computeIfAbsent(dashboardKey,
+                k -> new LoggedNetworkString(k, defaultValue));
+        return DriverStation.isFMSAttached() ? defaultValue : dashboardString.get();
+    }
+
+    private String dashboardKey(String key) {
+        if (key.startsWith(SMART_DASHBOARD_PREFIX)) {
+            return key;
         }
-        return SmartDashboard.getString(key, defaultValue);
+        return SMART_DASHBOARD_PREFIX + key;
     }
 }
