@@ -17,5 +17,9 @@
     "translationScale": 0.8,
     "translationToleranceInches": 1.5,
     "rotationToleranceDegrees": 2.0
+  },
+  "turretSubsystem": {
+    "enabled": true,
+    "verbose": false
   }
 }
