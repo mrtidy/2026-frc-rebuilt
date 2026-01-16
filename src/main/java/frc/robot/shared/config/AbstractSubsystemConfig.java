@@ -3,6 +3,7 @@ package frc.robot.shared.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
@@ -25,6 +26,8 @@ public abstract class AbstractSubsystemConfig {
 
     public boolean                                 verbose        = true;
 
+    private final Map<String, LoggedNetworkBoolean> tunableBooleans = new HashMap<>();
+
     private final Map<String, LoggedNetworkNumber> tunableNumbers = new HashMap<>();
 
     private final Map<String, LoggedNetworkString> tunableStrings = new HashMap<>();
@@ -42,6 +45,17 @@ public abstract class AbstractSubsystemConfig {
         LoggedNetworkNumber dashboardNumber = tunableNumbers.computeIfAbsent(resolvedKey,
                 k -> new LoggedNetworkNumber(k, defaultValue));
         return DriverStation.isFMSAttached() ? defaultValue : dashboardNumber.get();
+    }
+
+    /**
+     * Reads a tunable boolean backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
+     * falls back to the default when attached to FMS to avoid match-time latency.
+     */
+    protected boolean readTunableBoolean(String key, boolean defaultValue) {
+        String               resolvedKey      = dashboardKey(key);
+        LoggedNetworkBoolean dashboardBoolean = tunableBooleans.computeIfAbsent(resolvedKey,
+                k -> new LoggedNetworkBoolean(k, defaultValue));
+        return DriverStation.isFMSAttached() ? defaultValue : dashboardBoolean.get();
     }
 
     /**

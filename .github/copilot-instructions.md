@@ -59,6 +59,11 @@ Follow them whenever you add code, documentation, or tests.
 - Keep deployment assets under `src/main/deploy` (e.g., `subsystems.json` and
   mechanism configs like the swerve `controllerproperties.json`, module
   definitions, and trajectories).
+- Config classes should surface tunable suppliers for every runtime-adjustable
+  value (numbers and booleans) using the AdvantageKit-backed helpers (e.g.,
+  `readTunableNumber`, `readTunableBoolean`) so we can tweak on-robot without
+  redeploying. Store human-friendly defaults in the fields, then expose
+  `get*Supplier()` accessors that read the tunable values.
 - Subsystem folders may include a `README.md`; read it for a quick brief on
   behavior, key classes, and configuration before editing or generating code.
 

@@ -7,6 +7,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.devices.Motor;
 import frc.robot.shared.logging.Logger;
 
 /**
@@ -16,38 +18,38 @@ import frc.robot.shared.logging.Logger;
  * degrees for readability, convert to radians at the call site (e.g., {@code Units.degreesToRadians(...)}).
  * </p>
  */
-public abstract class AbstractMotor implements MotorIO {
+public abstract class AbstractMotor implements Motor {
 
     /** Default voltage compensation target applied to the controller. */
-    protected static final double DEFAULT_VOLTAGE_COMPENSATION = 12.0;
+    protected static final double DEFAULT_VOLTAGE_COMPENSATION   = 12.0;
 
-    protected final String name;
+    protected final String        name;
 
-    protected final Logger log;
+    protected final Logger        log;
 
-    protected final SparkMax motor;
+    protected final SparkMax      motor;
 
-    private final double minimumPositionRadians;
+    private final double          minimumPositionRadians;
 
-    private final double maximumPositionRadians;
+    private final double          maximumPositionRadians;
 
-    private final double positionRadiansPerMotorRotation;
+    private final double          positionRadiansPerMotorRotation;
 
-    private final double velocityRadPerSecPerMotorRpm;
+    private final double          velocityRadPerSecPerMotorRpm;
 
-    private double lastCommandedVolts          = 0.0;
+    private double                lastCommandedVolts             = 0.0;
 
-    private double lastCommandedPositionRads   = Double.NaN;
+    private double                lastCommandedPositionRads      = Double.NaN;
 
-    private double lastCommandedVelocityRadPerSec = Double.NaN;
+    private double                lastCommandedVelocityRadPerSec = Double.NaN;
 
     /**
      * Creates a motor wrapper with motion limits and a position conversion factor.
      *
-     * @param name                           friendly name for logging and dashboard keys
-     * @param deviceId                       CAN device ID for the SparkMax
-     * @param minimumPositionRadians         lowest allowed mechanism position (radians)
-     * @param maximumPositionRadians         highest allowed mechanism position (radians)
+     * @param name                             friendly name for logging and dashboard keys
+     * @param deviceId                         CAN device ID for the SparkMax
+     * @param minimumPositionRadians           lowest allowed mechanism position (radians)
+     * @param maximumPositionRadians           highest allowed mechanism position (radians)
      * @param mechanismRadiansPerMotorRotation conversion factor from one motor rotation to mechanism radians (includes gear ratio)
      */
     protected AbstractMotor(
@@ -63,11 +65,11 @@ public abstract class AbstractMotor implements MotorIO {
     /**
      * Creates a motor wrapper with motion limits, explicit motor type, and position conversion factor.
      *
-     * @param name                           friendly name for logging and dashboard keys
-     * @param deviceId                       CAN device ID for the SparkMax
-     * @param motorType                      motor type (brushed or brushless)
-     * @param minimumPositionRadians         lowest allowed mechanism position (radians)
-     * @param maximumPositionRadians         highest allowed mechanism position (radians)
+     * @param name                             friendly name for logging and dashboard keys
+     * @param deviceId                         CAN device ID for the SparkMax
+     * @param motorType                        motor type (brushed or brushless)
+     * @param minimumPositionRadians           lowest allowed mechanism position (radians)
+     * @param maximumPositionRadians           highest allowed mechanism position (radians)
      * @param mechanismRadiansPerMotorRotation conversion factor from one motor rotation to mechanism radians (includes gear ratio)
      */
     protected AbstractMotor(
@@ -78,29 +80,29 @@ public abstract class AbstractMotor implements MotorIO {
             double maximumPositionRadians,
             double mechanismRadiansPerMotorRotation) {
         this.name                            = name;
-    this.log                             = Logger.getInstance(this.getClass());
+        this.log                             = Logger.getInstance(this.getClass());
         this.minimumPositionRadians          = minimumPositionRadians;
         this.maximumPositionRadians          = maximumPositionRadians;
         this.positionRadiansPerMotorRotation = mechanismRadiansPerMotorRotation;
         this.velocityRadPerSecPerMotorRpm    = mechanismRadiansPerMotorRotation / 60.0;
 
-        this.motor = new SparkMax(deviceId, motorType);
+        this.motor                           = new SparkMax(deviceId, motorType);
         log.verbose("Configuring SparkMax motor " + name + " (device ID " + deviceId + ")");
 
         SparkMaxConfig config = new SparkMaxConfig();
         config.voltageCompensation(DEFAULT_VOLTAGE_COMPENSATION);
 
         // Allow subclasses to append hardware-specific settings.
-    config = configureMotor(config);
+        config = configureMotor(config);
 
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /**
      * Creates a motor wrapper without motion bounds. Positions are still reported in radians.
      *
-     * @param name                           friendly name for logging and dashboard keys
-     * @param deviceId                       CAN device ID for the SparkMax
+     * @param name                             friendly name for logging and dashboard keys
+     * @param deviceId                         CAN device ID for the SparkMax
      * @param mechanismRadiansPerMotorRotation conversion factor from one motor rotation to mechanism radians (includes gear ratio)
      */
     protected AbstractMotor(String name, int deviceId, double mechanismRadiansPerMotorRotation) {
@@ -113,9 +115,15 @@ public abstract class AbstractMotor implements MotorIO {
      *
      * @param volts desired voltage to apply
      */
+    @Override
     public void setVoltage(double volts) {
         lastCommandedVolts = volts;
         motor.setVoltage(volts);
+    }
+
+    @Override
+    public void setVoltage(Voltage voltage) {
+        setVoltage(voltage.in(edu.wpi.first.units.Units.Volts));
     }
 
     /**
@@ -124,13 +132,20 @@ public abstract class AbstractMotor implements MotorIO {
      * @param percent duty cycle request, where 1.0 equals full forward
      */
     public void setDutyCycle(double percent) {
-        lastCommandedVolts = percent * DEFAULT_VOLTAGE_COMPENSATION;
-        motor.set(percent);
+        double clampedPercent = clamp(percent, -1.0, 1.0);
+        lastCommandedVolts = clampedPercent * DEFAULT_VOLTAGE_COMPENSATION;
+        motor.set(clampedPercent);
+    }
+
+    @Override
+    public void setSpeed(double speed) {
+        setDutyCycle(speed);
     }
 
     /**
      * Stops motor output immediately.
      */
+    @Override
     public void stop() {
         motor.stopMotor();
     }
@@ -142,6 +157,11 @@ public abstract class AbstractMotor implements MotorIO {
      */
     public double getPositionRadians() {
         return motor.getEncoder().getPosition() * positionRadiansPerMotorRotation;
+    }
+
+    @Override
+    public double getEncoderPosition() {
+        return getPositionRadians();
     }
 
     /**
@@ -160,6 +180,11 @@ public abstract class AbstractMotor implements MotorIO {
      */
     public double getVelocityRadPerSec() {
         return motor.getEncoder().getVelocity() * velocityRadPerSecPerMotorRpm;
+    }
+
+    @Override
+    public double getEncoderVelocity() {
+        return getVelocityRadPerSec();
     }
 
     /**
@@ -198,12 +223,22 @@ public abstract class AbstractMotor implements MotorIO {
         return minimumPositionRadians;
     }
 
+    @Override
+    public double getMinimumTargetPosition() {
+        return minimumPositionRadians;
+    }
+
     /**
      * Returns the configured maximum allowed position in radians.
      *
      * @return upper motion bound (radians)
      */
     public double getMaximumPositionRadians() {
+        return maximumPositionRadians;
+    }
+
+    @Override
+    public double getMaximumTargetPosition() {
         return maximumPositionRadians;
     }
 
@@ -216,11 +251,17 @@ public abstract class AbstractMotor implements MotorIO {
         return motor.getBusVoltage() * motor.getAppliedOutput();
     }
 
+    @Override
+    public Voltage getVoltage() {
+        return edu.wpi.first.units.Units.Volts.of(getAppliedVolts());
+    }
+
     /**
      * Supplies the underlying SparkMax for advanced configuration or testing.
      *
      * @return backing SparkMax instance
      */
+    @Override
     public SparkMax getMotor() {
         return motor;
     }
@@ -265,7 +306,6 @@ public abstract class AbstractMotor implements MotorIO {
      * @return configured {@link SparkMaxConfig} ready for {@link SparkMax#configure}
      */
     protected abstract SparkMaxConfig configureMotor(SparkMaxConfig config);
-
 
     private double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
