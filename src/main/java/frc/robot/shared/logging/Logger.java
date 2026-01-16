@@ -37,9 +37,8 @@ public class Logger {
     /**
      * Returns an instance of Logger for the specified name
      *
-     * @param <T>       the type of the class for which the Logger instance is being created
-     * @param className the name to scope the logger instance to
-     * @return a new Logger instance for the specified class with the given verbosity setting
+    * @param className the name to scope the logger instance to
+    * @return a new Logger instance for the specified class with the given verbosity setting
      */
     public static Logger getInstance(String className) {
         return new Logger(className, false);
@@ -48,10 +47,9 @@ public class Logger {
     /**
      * Returns an instance of Logger for the specified name
      *
-     * @param <T>       the type of the class for which the Logger instance is being created
-     * @param className the name to scope the logger instance to
-     * @param verbose   the verbosity setting for the logger
-     * @return a new Logger instance for the specified class with the given verbosity setting
+    * @param className the name to scope the logger instance to
+    * @param verbose   the verbosity setting for the logger
+    * @return a new Logger instance for the specified class with the given verbosity setting
      */
     public static Logger getInstance(String className, boolean verbose) {
         return new Logger(className, verbose);
