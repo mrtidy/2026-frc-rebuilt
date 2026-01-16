@@ -167,7 +167,8 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
     /**
      * Applies the calculated setpoint to hardware. Override to customize control behavior.
      *
-     * @param setpoint The next state from the trapezoidal profile.
+     * @param setpoint       the next state from the trapezoidal profile
+     * @param voltageCommand requested motor voltage in volts before clamping
      */
     protected void applySetpoint(TrapezoidProfile.State setpoint, double voltageCommand) {
         double clampedVoltage = clamp(voltageCommand, -12.0, 12.0);

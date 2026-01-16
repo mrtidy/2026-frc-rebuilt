@@ -9,6 +9,10 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
+/**
+ * Base configuration bundle that mirrors values to AdvantageKit-backed SmartDashboard entries so they can be tuned without redeploying. Concrete
+ * configs inherit the tunable readers provided here.
+ */
 public abstract class AbstractSubsystemConfig {
     private static final String SMART_DASHBOARD_PREFIX = "SmartDashboard/";
 
@@ -20,17 +24,17 @@ public abstract class AbstractSubsystemConfig {
         return classPrefix + "/";
     }
 
-    private final String                           defaultDashboardPrefix;
+    private final String                            defaultDashboardPrefix;
 
-    public boolean                                 enabled        = true;
+    public boolean                                  enabled         = true;
 
-    public boolean                                 verbose        = true;
+    public boolean                                  verbose         = true;
 
     private final Map<String, LoggedNetworkBoolean> tunableBooleans = new HashMap<>();
 
-    private final Map<String, LoggedNetworkNumber> tunableNumbers = new HashMap<>();
+    private final Map<String, LoggedNetworkNumber>  tunableNumbers  = new HashMap<>();
 
-    private final Map<String, LoggedNetworkString> tunableStrings = new HashMap<>();
+    private final Map<String, LoggedNetworkString>  tunableStrings  = new HashMap<>();
 
     protected AbstractSubsystemConfig() {
         this.defaultDashboardPrefix = computeDefaultDashboardPrefix(getClass());
@@ -39,6 +43,10 @@ public abstract class AbstractSubsystemConfig {
     /**
      * Reads a tunable number backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
      * falls back to the default when attached to FMS to avoid match-time latency.
+     *
+     * @param key          dashboard key suffix to read (class prefix is applied automatically)
+     * @param defaultValue fallback value used when FMS is attached or no entry exists
+     * @return latest tunable number or the provided default when FMS is attached
      */
     protected double readTunableNumber(String key, double defaultValue) {
         String              resolvedKey     = dashboardKey(key);
@@ -50,6 +58,10 @@ public abstract class AbstractSubsystemConfig {
     /**
      * Reads a tunable boolean backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
      * falls back to the default when attached to FMS to avoid match-time latency.
+     *
+     * @param key          dashboard key suffix to read (class prefix is applied automatically)
+     * @param defaultValue fallback value used when FMS is attached or no entry exists
+     * @return latest tunable boolean or the provided default when FMS is attached
      */
     protected boolean readTunableBoolean(String key, boolean defaultValue) {
         String               resolvedKey      = dashboardKey(key);
@@ -61,6 +73,10 @@ public abstract class AbstractSubsystemConfig {
     /**
      * Reads a tunable string backed by AdvantageKit's logged network inputs so tweaks are captured in logs and respected during replay, but still
      * falls back to the default when attached to FMS to avoid match-time latency.
+     *
+     * @param key          dashboard key suffix to read (class prefix is applied automatically)
+     * @param defaultValue fallback value used when FMS is attached or no entry exists
+     * @return latest tunable string or the provided default when FMS is attached
      */
     protected String readTunableString(String key, String defaultValue) {
         String              resolvedKey     = dashboardKey(key);

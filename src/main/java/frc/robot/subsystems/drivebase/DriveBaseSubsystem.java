@@ -248,11 +248,6 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
     }
 
     /**
-     * Overrides the translation scale source so values can be fed from SmartDashboard or another tuning path.
-     *
-     * @param scaleSupplier supplier returning a 0–1 translation scale; falls back to config if null
-     */
-    /**
      * Stops all motion and locks the modules in their current orientation.
      */
     public void stop() {

@@ -7,27 +7,31 @@ import frc.robot.shared.subsystems.AbstractSetAndSeekSubsystem;
 import frc.robot.subsystems.turret.config.TurretSubsystemConfig;
 import frc.robot.subsystems.turret.devices.TurretMotor;
 
+/**
+ * Turret subsystem with a single profiled motor. Exposes the set-and-seek API so callers can drive to angles in degrees while the superclass handles
+ * motion profiling, limits, and logging.
+ */
 public class TurretSubsystem extends AbstractSetAndSeekSubsystem<TurretSubsystemConfig> {
     private static Motor buildMotor(TurretSubsystemConfig config) {
         if (RobotBase.isReal()) {
             return new TurretMotor(config);
         }
 
-    double motorRotationsPerMechanismRotation = config.getMotorRotationsPerMechanismRotationSupplier().get();
+        double motorRotationsPerMechanismRotation = config.getMotorRotationsPerMechanismRotationSupplier().get();
 
-    return new SimMotor(
-        "TurretMotorSim",
-        motorRotationsPerMechanismRotation,
-        config.getMinimumSetpointSupplier(),
-        config.getMaximumSetpointSupplier(),
-        config.getMaximumVelocitySupplier(),
-        config.getMaximumAccelerationSupplier());
+        return new SimMotor(
+                "TurretMotorSim",
+                motorRotationsPerMechanismRotation,
+                config.getMinimumSetpointSupplier(),
+                config.getMaximumSetpointSupplier(),
+                config.getMaximumVelocitySupplier(),
+                config.getMaximumAccelerationSupplier());
     }
 
     /**
      * Builds the turret subsystem with a single SparkMax-driven motor and default motion profile values.
      *
-     * @param config turret configuration bundle loaded from JSON
+     * @param config turret configuration bundle loaded from JSON; angles are expressed in degrees
      */
     public TurretSubsystem(TurretSubsystemConfig config) {
         this(config, buildMotor(config));

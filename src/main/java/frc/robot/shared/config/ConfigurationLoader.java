@@ -13,24 +13,27 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * Utility for loading subsystem configuration JSON from the deploy directory and mirroring fields to SmartDashboard for live tuning.
+ */
 public class ConfigurationLoader {
 
     /**
-     * Loads a configuration file from the deploy directory and maps it to a type
+     * Loads a configuration file from the deploy directory and maps it to a type.
      *
-     * @param <TConfig> The Java type to map the configuration file
-     * @param fileName  The name of the JSON file to load
-     * @param classOfT  The class type to map the configuration file to
-     * @return loaded configuration instance
-     * @throws ConfigurationException when the file cannot be loaded or parsed
+     * @param <TConfig> Java type to bind the configuration to
+     * @param fileName  JSON filename relative to {@code src/main/deploy}
+     * @param classOfT  class token for the configuration type
+     * @return loaded configuration instance with dashboard entries seeded
+     * @throws ConfigurationException when the file cannot be read or parsed
      */
     public static <TConfig> TConfig load(String fileName, Class<TConfig> classOfT) throws ConfigurationException {
         try {
-            // Generic and Mapping Setup
+            // Generic and mapping setup
             JavaType     type   = TypeFactory.defaultInstance().constructType(classOfT);
             ObjectMapper om     = new ObjectMapper();
 
-            // Custom Deserializer Setup
+            // Custom deserializer setup
             SimpleModule module = new SimpleModule();
             module.addDeserializer(Pose2d.class, new Pose2dDeserializer());
             om.registerModule(module);

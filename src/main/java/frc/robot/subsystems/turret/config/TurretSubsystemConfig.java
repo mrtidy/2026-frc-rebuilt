@@ -25,6 +25,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies the CAN ID (not typically tuned, but exposed for consistency/logging).
+     *
+     * @return supplier that yields the turret SparkMax CAN ID
      */
     public Supplier<Integer> getMotorCanIdSupplier() {
         return () -> (int) readTunableNumber("motorCanId", motorCanId);
@@ -32,6 +34,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies whether the turret motor output is inverted.
+     *
+     * @return supplier that indicates whether to invert motor output
      */
     public Supplier<Boolean> getMotorInvertedSupplier() {
         return () -> readTunableBoolean("motorInverted", motorInverted);
@@ -39,6 +43,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies the smart current limit in amps.
+     *
+     * @return supplier that yields the current limit in amps
      */
     public Supplier<Integer> getSmartCurrentLimitSupplier() {
         return () -> (int) readTunableNumber("smartCurrentLimitAmps", smartCurrentLimitAmps);
@@ -46,6 +52,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies the gear ratio (motor rotations per mechanism rotation).
+     *
+     * @return supplier that yields the motor rotations per one turret rotation
      */
     public Supplier<Double> getMotorRotationsPerMechanismRotationSupplier() {
         return () -> readTunableNumber("motorRotationsPerMechanismRotation", motorRotationsPerMechanismRotation);
@@ -53,6 +61,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies the minimum turret angle in degrees.
+     *
+     * @return supplier that yields the minimum turret setpoint in degrees
      */
     public Supplier<Double> getMinimumSetpointSupplier() {
         return () -> readTunableNumber("minimumSetpoint", minimumSetpoint);
@@ -60,6 +70,8 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
 
     /**
      * Supplies the maximum turret angle in degrees.
+     *
+     * @return supplier that yields the maximum turret setpoint in degrees
      */
     public Supplier<Double> getMaximumSetpointSupplier() {
         return () -> readTunableNumber("maximumSetpoint", maximumSetpoint);
