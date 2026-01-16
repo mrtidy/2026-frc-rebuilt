@@ -11,8 +11,9 @@ import frc.robot.shared.bindings.TriggerBindings;
 import frc.robot.shared.config.ConfigurationLoader;
 import frc.robot.shared.config.SubsystemsConfig;
 import frc.robot.subsystems.drivebase.DriveBaseSubsystem;
-import frc.robot.subsystems.drivebase.factories.DriveBaseSubsystemCommandFactory;
+import frc.robot.subsystems.drivebase.commands.DriveBaseSubsystemCommandFactory;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.turret.commands.TurretSubsystemCommandFactory;
 
 public class RobotContainer {
 
@@ -27,7 +28,10 @@ public class RobotContainer {
     // Command factories
     private final DriveBaseSubsystemCommandFactory driveBaseCommandFactory;
 
+    private final TurretSubsystemCommandFactory    turretCommandFactory;
+
     // Input bindings
+    @SuppressWarnings("unused")
     private final TriggerBindings                  triggerBindings;
 
     public RobotContainer() {
@@ -40,9 +44,13 @@ public class RobotContainer {
 
             // Command factories
             driveBaseCommandFactory = new DriveBaseSubsystemCommandFactory(driveBaseSubsystem);
+            turretCommandFactory    = new TurretSubsystemCommandFactory(turretSubsystem);
 
             // Input bindings
-            triggerBindings         = new TriggerBindings(driveBaseCommandFactory, subsystemsConfig.driveBaseSubsystem);
+            triggerBindings         = new TriggerBindings(
+                    driveBaseCommandFactory,
+                    subsystemsConfig.driveBaseSubsystem,
+                    turretCommandFactory);
         } catch (Exception e) {
             String message = "RobotContainer failed to initialize; robot will shut down.";
             DriverStation.reportError(message, e.getStackTrace());

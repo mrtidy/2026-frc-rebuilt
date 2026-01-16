@@ -31,12 +31,12 @@ public class TurretMotor extends AbstractMotor {
      * @param config turret configuration containing CAN ID, gear ratio, inversion, and motion bounds (degrees)
      */
     public TurretMotor(TurretSubsystemConfig config) {
-        super(
-                "TurretMotor",
-                config.getMotorCanIdSupplier().get(),
-                Units.degreesToRadians(config.getMinimumPositionDegreesSupplier().get()),
-                Units.degreesToRadians(config.getMaximumPositionDegreesSupplier().get()),
-                computeMechanismRadiansPerMotorRotation(config.getMotorRotationsPerMechanismRotationSupplier().get()));
+    super(
+        "TurretMotor",
+        config.getMotorCanIdSupplier().get(),
+        Units.degreesToRadians(config.getMinimumSetpointSupplier().get()),
+        Units.degreesToRadians(config.getMaximumSetpointSupplier().get()),
+        computeMechanismRadiansPerMotorRotation(config.getMotorRotationsPerMechanismRotationSupplier().get()));
         this.config = config;
     }
 
@@ -52,12 +52,12 @@ public class TurretMotor extends AbstractMotor {
 
     @Override
     public double getMaximumTargetPosition() {
-        return config.getMaximumPositionDegreesSupplier().get();
+        return config.getMaximumSetpointSupplier().get();
     }
 
     @Override
     public double getMinimumTargetPosition() {
-        return config.getMinimumPositionDegreesSupplier().get();
+        return config.getMinimumSetpointSupplier().get();
     }
 
     @Override

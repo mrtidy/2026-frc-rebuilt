@@ -96,7 +96,8 @@ The key folders under `src/main` you will touch most often are:
   - `logging/` for AdvantageKit and telemetry helpers.
   - `subsystems/` for abstract subsystem bases.
 - `java/frc/robot/subsystems/<mechanism>/` – concrete mechanism code, each with
-  its own `commands/`, `config/`, `factories/`, and `io/` folders.
+  its own `commands/` (including command factories), `config/`, and `io/`
+  folders.
 
 ![System overview diagram for the 2026 robot](./7160-frc-rebuilt.drawio.svg)
 

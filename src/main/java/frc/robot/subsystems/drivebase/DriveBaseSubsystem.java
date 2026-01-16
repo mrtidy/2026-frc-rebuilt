@@ -39,9 +39,9 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
  */
 public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConfig> {
 
-    private static final double               JOYSTICK_DEADBAND         = 0.08;
+    private static final double               JOYSTICK_DEADBAND       = 0.08;
 
-    private final Translation2d               centerOfRotationMeters    = new Translation2d();
+    private final Translation2d               centerOfRotationMeters  = new Translation2d();
 
     private final PIDController               xController;
 
@@ -53,23 +53,19 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
 
     private final DriveBaseIO                 io;
 
-    private final DriveBaseIOInputsAutoLogged inputs                    = new DriveBaseIOInputsAutoLogged();
+    private final DriveBaseIOInputsAutoLogged inputs                  = new DriveBaseIOInputsAutoLogged();
 
-    private final Field2d                     fieldDisplay              = new Field2d();
+    private final Field2d                     fieldDisplay            = new Field2d();
 
     private SwerveDrive                       swerveDrive;
 
     private SwerveController                  swerveController;
 
-    private boolean                           odometryWarningEmitted    = false;
+    private boolean                           odometryWarningEmitted  = false;
 
-    private double                            lastOdometryWarningTime   = -1.0;
+    private double                            lastOdometryWarningTime = -1.0;
 
-    private Optional<Pose2d>                  targetPose                = Optional.empty();
-
-    private Supplier<Double>                  translationScaleSupplier  = config.getTranslationScale();
-
-    private Supplier<Double>                  angularSpeedScaleSupplier = () -> 1.0;
+    private Optional<Pose2d>                  targetPose              = Optional.empty();
 
     public DriveBaseSubsystem(DriveBaseSubsystemConfig config) {
         super(config);
@@ -191,7 +187,7 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
         double        deadbandedLeft    = MathUtil.applyDeadband(rawLeft, JOYSTICK_DEADBAND);
 
         Translation2d rawVector         = new Translation2d(deadbandedForward, deadbandedLeft);
-        double        translationScale  = translationScaleSupplier.get();
+        double        translationScale  = config.getTranslationScale().get();
         Translation2d scaledVector      = SwerveMath.scaleTranslation(rawVector, translationScale);
         Translation2d commandedSpeeds   = new Translation2d(
                 scaledVector.getX() * config.getMaximumLinearSpeedMetersPerSecond().get(),
@@ -232,12 +228,10 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
      */
     public double mapDriverOmega(double omegaAxis) {
         double processed        = MathUtil.applyDeadband(-omegaAxis, JOYSTICK_DEADBAND);
-        double omegaScale       = angularSpeedScaleSupplier.get();
-        double radiansPerSecond = processed * config.getMaximumAngularSpeedRadiansPerSecond().get() * omegaScale;
+        double radiansPerSecond = processed * config.getMaximumAngularSpeedRadiansPerSecond().get();
 
         log.recordOutput("DriverInputs/omega/raw", omegaAxis);
         log.recordOutput("DriverInputs/omega/deadbanded", processed);
-        log.recordOutput("DriverInputs/omega/scale", omegaScale);
         log.recordOutput("DriverInputs/omega/radiansPerSecond", radiansPerSecond);
 
         return radiansPerSecond;
@@ -258,19 +252,6 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
      *
      * @param scaleSupplier supplier returning a 0–1 translation scale; falls back to config if null
      */
-    public void setTranslationScaleSupplier(Supplier<Double> scaleSupplier) {
-        translationScaleSupplier = scaleSupplier != null ? scaleSupplier : config.getTranslationScale();
-    }
-
-    /**
-     * Overrides the angular speed scale source so values can be fed from SmartDashboard or another tuning path.
-     *
-     * @param scaleSupplier supplier returning a scale applied to the max angular speed; defaults to 1.0 when null
-     */
-    public void setAngularSpeedScaleSupplier(Supplier<Double> scaleSupplier) {
-        angularSpeedScaleSupplier = scaleSupplier != null ? scaleSupplier : () -> 1.0;
-    }
-
     /**
      * Stops all motion and locks the modules in their current orientation.
      */

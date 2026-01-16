@@ -13,34 +13,15 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
     public int     motorCanId;
 
     /** True if the turret motor output should be inverted. */
-    public boolean motorInverted                      = false;
+    public boolean motorInverted;
 
     /** Smart current limit for the turret motor in amps. */
-    public int     smartCurrentLimitAmps              = 40;
+    public int     smartCurrentLimitAmps;
 
     /**
      * Gear ratio expressed as motor rotations per one turret rotation. Example: a 100:1 reduction should be written as 100.0.
      */
-    public double  motorRotationsPerMechanismRotation = 1.0;
-
-    /** Minimum allowed turret position in degrees (mechanism frame). */
-    public double  minimumPositionDegrees             = -180.0;
-
-    /** Maximum allowed turret position in degrees (mechanism frame). */
-    public double  maximumPositionDegrees             = 180.0;
-
-    /**
-     * Seeds turret profile defaults so the mechanism can move immediately after loading configuration.
-     */
-    public TurretSubsystemConfig() {
-        minimumSetpoint     = minimumPositionDegrees;
-        maximumSetpoint     = maximumPositionDegrees;
-        maximumVelocity     = 180.0;
-        maximumAcceleration = 360.0;
-        positionTolerance   = 1.0;
-        initialPosition     = 0.0;
-        initialVelocity     = 0.0;
-    }
+    public double  motorRotationsPerMechanismRotation;
 
     /**
      * Supplies the CAN ID (not typically tuned, but exposed for consistency/logging).
@@ -73,14 +54,14 @@ public class TurretSubsystemConfig extends AbstractSetAndSeekSubsystemConfig {
     /**
      * Supplies the minimum turret angle in degrees.
      */
-    public Supplier<Double> getMinimumPositionDegreesSupplier() {
-        return () -> readTunableNumber("minimumPositionDegrees", minimumPositionDegrees);
+    public Supplier<Double> getMinimumSetpointSupplier() {
+        return () -> readTunableNumber("minimumSetpoint", minimumSetpoint);
     }
 
     /**
      * Supplies the maximum turret angle in degrees.
      */
-    public Supplier<Double> getMaximumPositionDegreesSupplier() {
-        return () -> readTunableNumber("maximumPositionDegrees", maximumPositionDegrees);
+    public Supplier<Double> getMaximumSetpointSupplier() {
+        return () -> readTunableNumber("maximumSetpoint", maximumSetpoint);
     }
 }

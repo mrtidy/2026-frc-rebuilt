@@ -30,6 +30,8 @@ Follow them whenever you add code, documentation, or tests.
   the relevant `commands` packages; for set-and-seek style mechanisms, use
   `AbstractSetAndSeekCommand` (or a concrete subclass) to drive an
   `AbstractSetAndSeekSubsystem`.
+  - Command factories live alongside commands in each subsystem's `commands/`
+    folder (no standalone `factories/` folder).
 - Organize class members by visibility and role: public API at the top, followed
   by protected, package-private, and private helpers. Group overloads together.
 - Keep methods cohesive and self-descriptive. If logic is hard to infer from
@@ -52,9 +54,8 @@ Follow them whenever you add code, documentation, or tests.
     - `logging/` for AdvantageKit and telemetry helpers.
     - `subsystems/` for abstract subsystem bases.
   - `subsystems/<mechanism>/` houses concrete mechanisms, each with:
-    - `commands/` for that subsystem’s commands.
+    - `commands/` for that subsystem’s commands **and** command factories.
     - `config/` for mechanism-specific settings.
-    - `factories/` for wiring helpers/builders.
     - `io/` for hardware/sim I/O implementations.
 - Keep deployment assets under `src/main/deploy` (e.g., `subsystems.json` and
   mechanism configs like the swerve `controllerproperties.json`, module

@@ -1,5 +1,7 @@
 package frc.robot.shared.subsystems;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.devices.Motor;
 import frc.robot.devices.motor.MotorIOInputsAutoLogged;
@@ -14,17 +16,20 @@ import frc.robot.shared.config.AbstractSetAndSeekSubsystemConfig;
  * </p>
  */
 public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAndSeekSubsystemConfig> extends AbstractSubsystem<TConfig> {
-    protected final Motor                   motor;
+    protected final Motor                        motor;
 
-    protected final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
+    protected final MotorIOInputsAutoLogged      motorInputs = new MotorIOInputsAutoLogged();
 
-    protected TrapezoidProfile.Constraints  constraints;
+    protected TrapezoidProfile.Constraints       constraints;
 
-    protected TrapezoidProfile              profile;
+    protected final ProfiledPIDController        controller;
 
-    protected TrapezoidProfile.State        goalState;
+    protected final SimpleMotorFeedforward       feedforward;
 
-    protected TrapezoidProfile.State        setpointState;
+    protected TrapezoidProfile.State             goalState;
+
+    protected TrapezoidProfile.State             setpointState;
+
 
     /**
      * Creates a profiled subsystem with bounded setpoints, motion constraints, and a single motor.
@@ -36,15 +41,31 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
         super(config);
         this.motor  = motor;
 
-        constraints = new TrapezoidProfile.Constraints(config.getMaximumVelocitySupplier().get(),
-                config.getMaximumAccelerationSupplier().get());
-        profile     = new TrapezoidProfile(constraints);
+    constraints = new TrapezoidProfile.Constraints(config.getMaximumVelocitySupplier().get(),
+        config.getMaximumAccelerationSupplier().get());
+
+    controller = new ProfiledPIDController(
+        config.getkPSupplier().get(),
+        config.getkISupplier().get(),
+        config.getkDSupplier().get(),
+        constraints,
+        kDt);
+    controller.setTolerance(config.getPositionToleranceSupplier().get(),
+        config.getMaximumVelocitySupplier().get() * 0.05);
+
+    feedforward = new SimpleMotorFeedforward(
+        config.getkSSupplier().get(),
+        config.getkVSupplier().get(),
+        config.getkASupplier().get());
 
         double initialPosition = config.getInitialPositionSupplier().get();
         double initialVelocity = config.getInitialVelocitySupplier().get();
 
         goalState     = new TrapezoidProfile.State(initialPosition, 0.0);
         setpointState = new TrapezoidProfile.State(initialPosition, initialVelocity);
+
+        controller.reset(initialPosition, initialVelocity);
+        controller.setGoal(goalState);
     }
 
     /**
@@ -60,6 +81,8 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
         double clampedTarget = clamp(targetPosition, config.getMinimumSetpointSupplier().get(),
                 config.getMaximumSetpointSupplier().get());
         goalState = new TrapezoidProfile.State(clampedTarget, 0.0);
+
+    controller.setGoal(goalState);
     }
 
     /**
@@ -75,8 +98,15 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
 
         refreshConstraints();
 
-        setpointState = profile.calculate(kDt, setpointState, goalState);
-        applySetpoint(setpointState);
+        double measuredPosition = getMeasuredPosition();
+        double controllerOutput = controller.calculate(measuredPosition);
+
+        setpointState = controller.getSetpoint();
+
+        double feedforwardVolts = feedforward.calculate(setpointState.velocity);
+        double voltageCommand   = controllerOutput + feedforwardVolts;
+
+        applySetpoint(setpointState, voltageCommand);
         logSetpoint(setpointState, goalState);
     }
 
@@ -89,6 +119,9 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
     public void synchronizeToMeasurement(double position, double velocity) {
         setpointState = new TrapezoidProfile.State(position, velocity);
         goalState     = new TrapezoidProfile.State(position, 0.0);
+
+        controller.reset(position, velocity);
+        controller.setGoal(goalState);
     }
 
     /**
@@ -117,18 +150,11 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
      *
      * @param setpoint The next state from the trapezoidal profile.
      */
-    protected void applySetpoint(TrapezoidProfile.State setpoint) {
-        double maximumVelocity = Math.max(Math.abs(config.getMaximumVelocitySupplier().get()), 1e-6);
-        double velocityTerm    = clamp(setpoint.velocity / maximumVelocity, -1.0, 1.0);
+    protected void applySetpoint(TrapezoidProfile.State setpoint, double voltageCommand) {
+        double clampedVoltage = clamp(voltageCommand, -12.0, 12.0);
+        motor.setVoltage(clampedVoltage);
 
-        double error           = setpoint.position - getMeasuredPosition();
-        double range           = config.getMaximumSetpointSupplier().get() - config.getMinimumSetpointSupplier().get();
-        double positionTerm    = range != 0.0 ? clamp(error / range, -1.0, 1.0) : 0.0;
-
-        double outputPercent   = clamp(positionTerm + velocityTerm, -1.0, 1.0);
-        motor.setSpeed(outputPercent);
-
-        log.recordOutput("commandedDutyCycle", outputPercent);
+        log.recordOutput("commandedVoltage", clampedVoltage);
     }
 
     /**
@@ -165,6 +191,6 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
     private void refreshConstraints() {
         constraints = new TrapezoidProfile.Constraints(config.getMaximumVelocitySupplier().get(),
                 config.getMaximumAccelerationSupplier().get());
-        profile     = new TrapezoidProfile(constraints);
+        controller.setConstraints(constraints);
     }
 }

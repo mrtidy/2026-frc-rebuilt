@@ -11,7 +11,7 @@ swerve hardware, exposes a simple API for commands, and keeps logging wired up.
   field-relative chassis speeds.
 - `config/DriveBaseSubsystemConfig` – loads tuning values (max speeds,
   tolerances) and links to the swerve JSON files in `src/main/deploy/swerve/`.
-- `factories/DriveBaseSubsystemCommandFactory` – builds drive commands and sets
+- `commands/DriveBaseSubsystemCommandFactory` – builds drive commands and sets
   the default manual drive command.
 - `io/DriveBaseIO` and `io/DriveBaseIOYagsl` – interface and YAGSL-backed
   implementation that feed sensor data to AdvantageKit.
@@ -47,4 +47,4 @@ swerve hardware, exposes a simple API for commands, and keeps logging wired up.
 - Preserve field-centric control and AdvantageKit logging; new commands should
   reuse `DriveBaseSubsystem` helpers and log important targets and states.
 - Keep command names ending in `Command` and factory helpers in
-  `factories/DriveBaseSubsystemCommandFactory`.
+  `commands/DriveBaseSubsystemCommandFactory`.

@@ -20,6 +20,23 @@
   },
   "turretSubsystem": {
     "enabled": true,
-    "verbose": false
+    "verbose": false,
+    "motorCanId": 0,
+    "motorInverted": false,
+    "smartCurrentLimitAmps": 40,
+    "motorRotationsPerMechanismRotation": 1.0,
+    "minimumSetpoint": -560.0,
+    "maximumSetpoint": 560.0,
+    "maximumVelocity": 15.0,
+    "maximumAcceleration": 1.0,
+    "positionTolerance": 1.0,
+    "initialPosition": 0.0,
+    "initialVelocity": 0.0,
+    "kP": 0.02,
+    "kI": 0.0,
+    "kD": 0.0,
+    "kS": 0.0,
+    "kV": 0.0,
+    "kA": 0.0
   }
 }
