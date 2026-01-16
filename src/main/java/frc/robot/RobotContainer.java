@@ -7,11 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.factories.DriveBaseSubsystemCommandFactory;
-import frc.robot.config.ConfigurationLoader;
-import frc.robot.config.SubsystemsConfig;
-import frc.robot.helpers.TriggerBindings;
+import frc.robot.shared.bindings.TriggerBindings;
+import frc.robot.shared.config.ConfigurationLoader;
+import frc.robot.shared.config.SubsystemsConfig;
 import frc.robot.subsystems.drivebase.DriveBaseSubsystem;
+import frc.robot.subsystems.drivebase.factories.DriveBaseSubsystemCommandFactory;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class RobotContainer {

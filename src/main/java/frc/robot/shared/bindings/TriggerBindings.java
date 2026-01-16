@@ -1,10 +1,10 @@
-package frc.robot.helpers;
+package frc.robot.shared.bindings;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.factories.DriveBaseSubsystemCommandFactory;
-import frc.robot.config.DriveBaseSubsystemConfig;
 import frc.robot.devices.GameController;
 import frc.robot.devices.GameController.GameControllerAxes;
+import frc.robot.subsystems.drivebase.config.DriveBaseSubsystemConfig;
+import frc.robot.subsystems.drivebase.factories.DriveBaseSubsystemCommandFactory;
 
 /**
  * Maps the driver controller to robot commands so RobotContainer stays lean. Currently wires the drive controller to the default manual drive

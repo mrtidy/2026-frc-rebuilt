@@ -1,12 +1,13 @@
-package frc.robot.commands.factories;
+package frc.robot.subsystems.drivebase.factories;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.drivebase.MoveFieldManualCommand;
+import frc.robot.shared.commands.AbstractSubsystemCommandFactory;
 import frc.robot.subsystems.drivebase.DriveBaseSubsystem;
+import frc.robot.subsystems.drivebase.commands.MoveFieldManualCommand;
 
 public class DriveBaseSubsystemCommandFactory extends AbstractSubsystemCommandFactory<DriveBaseSubsystem> {
 
@@ -46,13 +47,13 @@ public class DriveBaseSubsystemCommandFactory extends AbstractSubsystemCommandFa
             Supplier<Double> forwardAxis,
             Supplier<Double> leftAxis,
             Supplier<Double> omegaAxis) {
-    Supplier<Translation2d> translationSupplier = subsystem.mapDriverTranslationSupplier(forwardAxis, leftAxis);
-    Supplier<Double>        omegaSupplier       = subsystem.mapDriverOmegaSupplier(omegaAxis);
+        Supplier<Translation2d> translationSupplier = subsystem.mapDriverTranslationSupplier(forwardAxis, leftAxis);
+        Supplier<Double>        omegaSupplier       = subsystem.mapDriverOmegaSupplier(omegaAxis);
 
-    Command manualDriveCommand = createMoveManualCommand(
-        () -> translationSupplier.get().getX(),
-        () -> translationSupplier.get().getY(),
-        () -> omegaSupplier.get());
+        Command manualDriveCommand = createMoveManualCommand(
+                () -> translationSupplier.get().getX(),
+                () -> translationSupplier.get().getY(),
+                () -> omegaSupplier.get());
 
         subsystem.setDefaultCommand(manualDriveCommand);
         return manualDriveCommand;

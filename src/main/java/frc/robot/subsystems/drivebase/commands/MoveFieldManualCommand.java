@@ -1,8 +1,8 @@
-package frc.robot.commands.drivebase;
+package frc.robot.subsystems.drivebase.commands;
 
 import java.util.function.DoubleSupplier;
 
-import frc.robot.commands.AbstractSubsystemCommand;
+import frc.robot.shared.commands.AbstractSubsystemCommand;
 import frc.robot.subsystems.drivebase.DriveBaseSubsystem;
 
 /**

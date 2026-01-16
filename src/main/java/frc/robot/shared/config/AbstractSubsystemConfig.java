@@ -1,4 +1,4 @@
-package frc.robot.config;
+package frc.robot.shared.config;
 
 import java.util.HashMap;
 import java.util.Map;

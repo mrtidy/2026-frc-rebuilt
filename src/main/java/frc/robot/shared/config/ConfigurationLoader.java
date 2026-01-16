@@ -1,4 +1,4 @@
-package frc.robot.config;
+package frc.robot.shared.config;
 
 import java.io.File;
 
@@ -21,8 +21,8 @@ public class ConfigurationLoader {
      * @param <TConfig> The Java type to map the configuration file
      * @param fileName  The name of the JSON file to load
      * @param classOfT  The class type to map the configuration file to
-     * @return
-     * @throws ConfigurationException
+     * @return loaded configuration instance
+     * @throws ConfigurationException when the file cannot be loaded or parsed
      */
     public static <TConfig> TConfig load(String fileName, Class<TConfig> classOfT) throws ConfigurationException {
         try {
@@ -68,7 +68,7 @@ public class ConfigurationLoader {
                 SmartDashboard.putNumber(fieldName, (Integer) fieldValue);
             } else if (fieldValue instanceof String) {
                 SmartDashboard.putString(fieldName, (String) fieldValue);
-            } else if (fieldValue != null && fieldValue.getClass().getName().startsWith("frc.robot.config")) {
+            } else if (fieldValue != null && fieldValue.getClass().getName().startsWith("frc.robot.subsystems")) {
                 iterateFields(fieldValue.getClass(), fieldValue, fieldName);
             }
         }

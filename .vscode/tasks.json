@@ -21,6 +21,19 @@
 				"$gradle"
 			],
 			"label": "gradle: build"
+		},
+		{
+			"label": "gradle: build",
+			"type": "shell",
+			"command": "./gradlew",
+			"args": [
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"group": "build"
 		}
 	]
 }

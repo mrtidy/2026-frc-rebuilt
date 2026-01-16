@@ -1,4 +1,4 @@
-package frc.robot.helpers;
+package frc.robot.shared.logging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -199,47 +199,12 @@ public class Logger {
      * Logs a message to the SmartDashboard with a specified key and value. This method will only log the message if verbose output is enabled.
      *
      * @param key   The key under which the value will be stored. The key will be prefixed with the class name followed by a '/'.
-     * @param value the value to be logged
-     */
-    public void dashboardVerbose(String key, boolean value) {
-        if (verbose) {
-            dashboard(key, value);
-        }
-    }
-
-    /**
-     * Logs a message to the SmartDashboard with a specified key and value. This method will only log the message if verbose output is enabled.
-     *
-     * @param key   The key under which the value will be stored. The key will be prefixed with the class name followed by a '/'.
-     * @param value the value to be logged
-     */
-    public void dashboardVerbose(String key, double value) {
-        if (verbose) {
-            dashboard(key, value);
-        }
-    }
-
-    /**
-     * Logs a message to the SmartDashboard with a specified key and value. This method will only log the message if verbose output is enabled.
-     *
-     * @param key   The key under which the value will be stored. The key will be prefixed with the class name followed by a '/'.
-     * @param value the object to be logged
+     * @param value The Sendable value to be logged to the SmartDashboard.
      */
     public void dashboardVerbose(String key, Sendable value) {
         if (verbose) {
-            dashboard(key, value);
-        }
-    }
-
-    /**
-     * Logs a message to the SmartDashboard with a specified key and value. This method will only log the message if verbose output is enabled.
-     *
-     * @param key   The key under which the value will be stored. The key will be prefixed with the class name followed by a '/'.
-     * @param value the value to be logged
-     */
-    public void dashboardVerbose(String key, String value) {
-        if (verbose) {
-            dashboard(key, value);
+            SmartDashboard.putData(className + '/' + key, value);
+            debug(key + ": sendable logged to dashboard (verbose)");
         }
     }
 }

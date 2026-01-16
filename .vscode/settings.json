@@ -79,4 +79,5 @@
   },
   "wpilib.autoStartRioLog": false,
   "wpilib.skipTests": true,
+  "chat.agent.maxRequests": 100,
 }

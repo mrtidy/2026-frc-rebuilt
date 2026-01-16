@@ -1,8 +1,8 @@
-package frc.robot.commands;
+package frc.robot.shared.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.helpers.Logger;
-import frc.robot.subsystems.AbstractSubsystem;
+import frc.robot.shared.logging.Logger;
+import frc.robot.shared.subsystems.AbstractSubsystem;
 
 /**
  * Lightweight base command that ties a command to a single subsystem and logs when it starts. Subclasses should override the lifecycle hooks as

@@ -1,6 +1,6 @@
-package frc.robot.commands.factories;
+package frc.robot.shared.commands;
 
-import frc.robot.subsystems.AbstractSubsystem;
+import frc.robot.shared.subsystems.AbstractSubsystem;
 
 public abstract class AbstractSubsystemCommandFactory<TSubsystem extends AbstractSubsystem<?>> {
     protected final TSubsystem subsystem;
