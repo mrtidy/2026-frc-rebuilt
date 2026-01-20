@@ -1,50 +1,46 @@
 # Drivebase subsystem
 
-This folder holds everything that moves the robot on the field. It wraps the
-swerve hardware, exposes a simple API for commands, and keeps logging wired up.
+## Role (game/mechanical)
 
-## What lives here
+Runs the swerve drive so the robot moves and orients on the field. Provides
+field-centric control, odometry, and pose targeting with AdvantageKit logging to
+support scoring and navigation.
 
-- `DriveBaseSubsystem` – the main class that owns odometry, field-relative
-  driving, and pose targeting using YAGSL.
-- `commands/MoveFieldManualCommand` – turns driver stick inputs into
-  field-relative chassis speeds.
-- `config/DriveBaseSubsystemConfig` – loads tuning values (max speeds,
-  tolerances) and links to the swerve JSON files in `src/main/deploy/swerve/`.
-- `commands/DriveBaseSubsystemCommandFactory` – builds drive commands and sets
-  the default manual drive command.
-- `io/DriveBaseIO` and `io/DriveBaseIOYagsl` – interface and YAGSL-backed
-  implementation that feed sensor data to AdvantageKit.
+## Control and configuration (programming)
 
-## How it behaves
-
-- Uses field-centric control so forward on the stick always means field +X,
-  regardless of robot facing.
-- Publishes odometry, module states, and targets to AdvantageKit for replay and
-  tuning.
-- Holds optional target poses for autonomous-style aiming and uses PID
-  controllers to drive toward them.
-
-## Configuration notes
-
-- Hardware geometry and module tuning live in the deploy files under
+- Field-centric: forward on the stick is always field +X regardless of robot
+  heading.
+- Uses YAGSL-backed IO for module control; supports sim-only runs when disabled
+  in `subsystems.json`.
+- Geometry and module tuning come from deploy files under
   `src/main/deploy/swerve/` (controller properties, module definitions, PIDF
   gains).
-- `subsystems.json` controls whether the drivebase is enabled for a given build;
-  when disabled, the subsystem skips hardware init for sim-only runs.
+- Converts driver inputs into field-relative chassis speeds via
+  `MoveFieldManualCommand`.
+- Drives toward target poses using PID when commands request autonomous-style
+  aiming.
 
-## When to edit
+## Code structure and maintenance
 
-- Add or tweak commands when driver controls or auto behaviors change.
-- Update config values when you retune speeds, deadbands, or tolerances.
-- Adjust the deploy JSON files if hardware IDs, geometry, or module settings
-  change.
+- Classes:
+  - `DriveBaseSubsystem` owns odometry, field-relative driving, holonomic pose
+    chasing, joystick deadband/scale mapping, and AdvantageKit logging. Falls
+    back to a no-op IO when the subsystem is disabled in `subsystems.json`.
+  - `commands/MoveFieldManualCommand` applies field-relative chassis speeds;
+    `commands/DriveBaseSubsystemCommandFactory` wires driver axes, sets the
+    default manual command, and exposes SysId commands via YAGSL helpers.
+  - `config/DriveBaseSubsystemConfig` exposes tunables for max linear/angular
+    speed and accel, translation/rotation PID gains and tolerances, heading PID,
+    and joystick translation scale.
+  - `io/DriveBaseIO` defines logged inputs; `io/DriveBaseIOYagsl` pulls pose,
+    gyro, and module states from the active `SwerveDrive` into
+    `DriveBaseIOInputsAutoLogged`.
+- Reviewer notes: keep field-centric behavior and AdvantageKit logging; new
+  commands should reuse subsystem helpers (mapping, pose targets, stop/lock) and
+  log targets/states; maintain command names ending in `Command` and factories
+  in `commands/`; preserve SysId helpers for drivetrain validation.
 
-## For Copilot and reviewers
+## TODO
 
-- Treat this README as the quick brief before changing drive code; keep it
-  updated when behaviors or key classes change.
-- Preserve field-centric control and AdvantageKit logging; new commands should
-  reuse `DriveBaseSubsystem` helpers and log important targets and states.
-- Keep command names ending in `Command` and factory helpers in
-  `commands/DriveBaseSubsystemCommandFactory`.
+- Revisit tuning and deploy configs after first on-bot drive tests; add more
+  autonomous poses and driver aids as needed.
