@@ -3,8 +3,8 @@ package frc.robot.shared.commands;
 import frc.robot.shared.subsystems.AbstractSetAndSeekSubsystem;
 
 /**
- * Retargets a set-and-seek subsystem to its current position and runs the profiled controller until it reports settled, then stops the motor. Use
- * this to decelerate gracefully instead of hard-stopping when a move finishes or is interrupted.
+ * Retargets a set-and-seek subsystem to its current position and runs the profiled controller until it reports settled, then stops the motor. This
+ * reset uses the live position and velocity so the controller decelerates smoothly instead of snapping back to a stale setpoint.
  *
  * @param <TSubsystem> concrete set-and-seek subsystem type
  */
@@ -35,6 +35,6 @@ public class SetAndSeekSettleCommand<TSubsystem extends AbstractSetAndSeekSubsys
 
     @Override
     protected void onInitialize() {
-        subsystem.holdCurrentPosition();
+        subsystem.settleAtCurrentPosition();
     }
 }

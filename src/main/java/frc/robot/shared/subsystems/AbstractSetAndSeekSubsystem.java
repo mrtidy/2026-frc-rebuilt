@@ -151,6 +151,44 @@ public abstract class AbstractSetAndSeekSubsystem<TConfig extends AbstractSetAnd
     }
 
     /**
+     * Retargets the profile using the latest measured position and velocity to settle without oscillation.
+     * <p>
+     * Call this when interrupting a moving command so the controller decelerates smoothly from the current motion state.
+     * </p>
+     */
+    public void settleAtCurrentPosition() {
+        if (isSubsystemDisabled()) {
+            return;
+        }
+
+        double measuredPosition = getMeasuredPosition();
+        double measuredVelocity = getMeasuredVelocity();
+
+        controller.reset(measuredPosition, measuredVelocity);
+        setTarget(measuredPosition);
+    }
+
+    /**
+     * Retargets the profile to a new goal while preserving the current measured motion state.
+     * <p>
+     * Use this when issuing a fresh goal during motion to avoid a snap back to the old setpoint state.
+     * </p>
+     *
+     * @param targetPosition Desired mechanism position (same units as the configuration).
+     */
+    public void settleAtTarget(double targetPosition) {
+        if (isSubsystemDisabled()) {
+            return;
+        }
+
+        double measuredPosition = getMeasuredPosition();
+        double measuredVelocity = getMeasuredVelocity();
+
+        controller.reset(measuredPosition, measuredVelocity);
+        setTarget(targetPosition);
+    }
+
+    /**
      * States whether the profiled controller is within both position and velocity tolerances of its goal.
      *
      * @return True when the profile reports settled.
