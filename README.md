@@ -122,6 +122,8 @@ code so WPILib will automatically pull the right artifacts:
   can diagnose the robot off-field.
 - **WPILib New Commands** – keeps the declarative command-based framework
   separate so we can stay current with WPILib updates.
+- **PathPlannerLib** – supplies the PathPlanner runtime library for autonomous
+  path following, path loading, and holonomic control helpers.
 - **YAGSL (Yet Another Generic Swerve Library)** – manages the swerve drive
   kinematics, control loops, and auto pathing layers for the drivetrain.
   - **CTRE Phoenix 5 & 6** – covers Talon SRX/Victor SPX legacy controllers (v5)
@@ -129,8 +131,8 @@ code so WPILib will automatically pull the right artifacts:
     and mechanisms.
   - **REVLib** – interfaces with Spark MAX motor controllers, NEO brushless
     motors, and REV sensors used on manipulators.
-  - **Studica** – adds support for the Studica control interface hardware that
-    powers our custom operator panel.
+  - **StudicaLib** – adds support for the Studica control interface hardware
+    that powers our custom operator panel.
   - **ThriftyLib** – supplies device wrappers for ThriftyBot sensors (such as
     absolute encoders and power modules) integrated into this robot.
 

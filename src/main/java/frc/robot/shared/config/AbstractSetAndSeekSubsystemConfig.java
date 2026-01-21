@@ -9,7 +9,7 @@ import java.util.function.Supplier;
  * the subsystem. Every field is mirrored to the dashboard so it can be tuned live without redeploying.
  * </p>
  */
-public abstract class AbstractSetAndSeekSubsystemConfig extends AbstractSubsystemConfig {
+public abstract class AbstractSetAndSeekSubsystemConfig extends AbstractConfig {
     /** Minimum allowed setpoint for the profile, in mechanism units. */
     public double minimumSetpoint;
 

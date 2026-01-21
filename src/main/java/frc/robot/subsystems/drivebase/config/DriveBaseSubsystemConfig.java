@@ -3,13 +3,13 @@ package frc.robot.subsystems.drivebase.config;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.shared.config.AbstractSubsystemConfig;
+import frc.robot.shared.config.AbstractConfig;
 
 /**
  * Configuration bundle for the drive base subsystem. The values are mirrored to SmartDashboard so they can be tuned live without redeploying
  * firmware.
  */
-public class DriveBaseSubsystemConfig extends AbstractSubsystemConfig {
+public class DriveBaseSubsystemConfig extends AbstractConfig {
 
     public double maximumLinearSpeedFeetPerSecond;
 

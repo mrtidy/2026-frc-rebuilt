@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  * Base configuration bundle that mirrors values to AdvantageKit-backed SmartDashboard entries so they can be tuned without redeploying. Concrete
  * configs inherit the tunable readers provided here.
  */
-public abstract class AbstractSubsystemConfig {
+public abstract class AbstractConfig {
     private static final String SMART_DASHBOARD_PREFIX = "SmartDashboard/";
 
     private static String computeDefaultDashboardPrefix(Class<?> clazz) {
@@ -36,7 +36,7 @@ public abstract class AbstractSubsystemConfig {
 
     private final Map<String, LoggedNetworkString>  tunableStrings  = new HashMap<>();
 
-    protected AbstractSubsystemConfig() {
+    protected AbstractConfig() {
         this.defaultDashboardPrefix = computeDefaultDashboardPrefix(getClass());
     }
 

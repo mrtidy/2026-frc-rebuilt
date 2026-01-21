@@ -4,11 +4,15 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.shared.bindings.TriggerBindings;
 import frc.robot.shared.config.ConfigurationLoader;
+import frc.robot.shared.config.FieldLayoutConfig;
 import frc.robot.shared.config.SubsystemsConfig;
 import frc.robot.subsystems.drivebase.DriveBaseSubsystem;
 import frc.robot.subsystems.drivebase.commands.DriveBaseSubsystemCommandFactory;
@@ -19,6 +23,10 @@ public class RobotContainer {
 
     // Configuration
     private final SubsystemsConfig                 subsystemsConfig;
+
+    private final FieldLayoutConfig                fieldLayoutConfig;
+
+    private final Supplier<AprilTagFieldLayout>    aprilTagFieldLayoutSupplier;
 
     // Subsystems
     private final DriveBaseSubsystem               driveBaseSubsystem;
@@ -36,18 +44,20 @@ public class RobotContainer {
 
     public RobotContainer() {
         try {
-            subsystemsConfig        = ConfigurationLoader.load("subsystems.json", SubsystemsConfig.class);
+            subsystemsConfig            = ConfigurationLoader.load("subsystems.json", SubsystemsConfig.class);
+            fieldLayoutConfig           = ConfigurationLoader.load("field-layout.json", FieldLayoutConfig.class);
+            aprilTagFieldLayoutSupplier = fieldLayoutConfig::loadLayout;
 
             // Subsystems
-            driveBaseSubsystem      = new DriveBaseSubsystem(subsystemsConfig.driveBaseSubsystem);
-            turretSubsystem         = new TurretSubsystem(subsystemsConfig.turretSubsystem);
+            driveBaseSubsystem          = new DriveBaseSubsystem(subsystemsConfig.driveBaseSubsystem);
+            turretSubsystem             = new TurretSubsystem(subsystemsConfig.turretSubsystem);
 
             // Command factories
-            driveBaseCommandFactory = new DriveBaseSubsystemCommandFactory(driveBaseSubsystem);
-            turretCommandFactory    = new TurretSubsystemCommandFactory(turretSubsystem);
+            driveBaseCommandFactory     = new DriveBaseSubsystemCommandFactory(driveBaseSubsystem);
+            turretCommandFactory        = new TurretSubsystemCommandFactory(turretSubsystem);
 
             // Input bindings
-            triggerBindings         = new TriggerBindings(
+            triggerBindings             = new TriggerBindings(
                     driveBaseCommandFactory,
                     subsystemsConfig.driveBaseSubsystem,
                     turretCommandFactory);
@@ -56,6 +66,18 @@ public class RobotContainer {
             DriverStation.reportError(message, e.getStackTrace());
             throw e instanceof RuntimeException ? (RuntimeException) e : new IllegalStateException(message, e);
         }
+    }
+
+    /**
+     * Returns the active AprilTag field layout for navigation and vision targeting.
+     * <p>
+     * Use this to look up tag poses for autonomous destinations or pose correction.
+     * </p>
+     *
+     * @return loaded AprilTag field layout with the configured origin applied
+     */
+    public AprilTagFieldLayout getAprilTagFieldLayout() {
+        return aprilTagFieldLayoutSupplier.get();
     }
 
     public Command getAutonomousCommand() {
