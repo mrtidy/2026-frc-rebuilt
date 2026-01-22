@@ -1,5 +1,6 @@
 package frc.robot.shared.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.shared.config.AbstractConfig;
@@ -13,15 +14,13 @@ import frc.robot.shared.logging.Logger;
  * </p>
  */
 public abstract class AbstractSubsystem<TConfig extends AbstractConfig> extends SubsystemBase {
-    protected static double kDt          = 0.02;
+    protected static double kDt = 0.02;
 
     protected TConfig       config;
 
     protected String        className;
 
     protected boolean       verbose;
-
-    protected boolean       isSimulation = !RobotBase.isReal();
 
     protected Logger        log;
 
@@ -56,5 +55,32 @@ public abstract class AbstractSubsystem<TConfig extends AbstractConfig> extends 
      */
     public boolean isSubsystemDisabled() {
         return !enabled;
+    }
+
+    /**
+     * Reports whether the code is running in WPILib simulation.
+     *
+     * @return True when running in simulation rather than on a real robot.
+     */
+    protected boolean isSimulation() {
+        return !RobotBase.isReal();
+    }
+
+    /**
+     * Reports whether the code is running on real robot hardware.
+     *
+     * @return True when running on a real robot.
+     */
+    protected boolean isReal() {
+        return RobotBase.isReal();
+    }
+
+    /**
+     * Reports whether the robot is attached to the FMS at call time.
+     *
+     * @return True when running on a real robot that is currently FMS attached.
+     */
+    protected boolean isFMSAttached() {
+        return RobotBase.isReal() && DriverStation.isFMSAttached();
     }
 }

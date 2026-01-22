@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -150,7 +149,7 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
      */
     @Override
     public void periodic() {
-        if (!DriverStation.isFMSAttached()) {
+        if (!isFMSAttached()) {
             refreshTunables();
         }
 
@@ -534,7 +533,7 @@ public class DriveBaseSubsystem extends AbstractSubsystem<DriveBaseSubsystemConf
             swerveDrive                    = new SwerveParser(configDirectory)
                     .createSwerveDrive(config.getMaximumLinearSpeedMetersPerSecond().get());
 
-            if (isSimulation) {
+            if (isSimulation()) {
                 swerveDrive.setHeadingCorrection(false);
                 swerveDrive.setCosineCompensator(false);
                 SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
